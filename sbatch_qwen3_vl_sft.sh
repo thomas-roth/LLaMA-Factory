@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Job Settings - FAST VERSION for testing/prototyping
+# Job Settings
 #SBATCH -A hk-project-p0024638  # Project name
-#SBATCH -J iTRAP_Qwen3_VL_SFT_FAST     # Job name
+#SBATCH -J iTRAP_Qwen3_VL_SFT   # Job name
 
 # Cluster Settings
 #SBATCH -p accelerated          # Partition name
@@ -10,7 +10,7 @@
 #SBATCH --ntasks-per-node=1     # Number of tasks per node
 #SBATCH --gres=gpu:1            # Number of GPUs
 #SBATCH -c 4                    # Number of cores per task
-#SBATCH -t 0:20:00              # Time limit
+#SBATCH -t 10:00:00             # Time limit
 
 # Define the paths for storing output and error files
 #SBATCH --output=/home/hk-project-p0024638/uruox/DIR/hkfswork/uruox-llama-factory/qwen3_vl/logs/%x_%j.out
@@ -24,11 +24,15 @@ source /home/hk-project-p0024638/uruox/miniconda3/bin/activate lf
 export TORCH_USE_CUDA_DSA=1
 export CUDA_LAUNCH_BLOCKING=0
 
-export OUTPUT_DIR="saves/Qwen3-VL-8B-Instruct/lora/train_2025-10-22_11-59-57_fast"
+TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
+export OUTPUT_DIR="saves/Qwen3-VL-8B-Instruct/lora/train_${TIMESTAMP}"
+mkdir -p $OUTPUT_DIR
 
 llamafactory-cli train \
     --stage sft \
     --do_train True \
+    --do_predict True \
+    --predict_with_generate True \
     --model_name_or_path Qwen/Qwen3-VL-8B-Instruct \
     --preprocessing_num_workers 16 \
     --finetuning_type lora \
@@ -39,18 +43,21 @@ llamafactory-cli train \
     --eval_dataset iTRAP_qwen3_vl_val \
     --do_eval True \
     --eval_strategy epoch \
-    --save_strategy no \
+    --save_strategy epoch \
+    --load_best_model_at_end True \
+    --metric_for_best_model eval_loss \
+    --greater_is_better False \
+    --early_stopping_steps 3 \
     --cutoff_len 2048 \
     --learning_rate 5e-05 \
-    --num_train_epochs 1 \
-    --max_samples 50 \
-    --per_device_train_batch_size 4 \
+    --num_train_epochs 9 \
+    --max_samples 100000 \
+    --per_device_train_batch_size 16 \
     --per_device_eval_batch_size 2 \
-    --gradient_accumulation_steps 8 \
-    --gradient_checkpointing True \
+    --gradient_accumulation_steps 4 \
     --lr_scheduler_type cosine \
     --max_grad_norm 1.0 \
-    --logging_steps 5 \
+    --logging_steps 10 \
     --warmup_steps 20 \
     --packing False \
     --enable_thinking False \
@@ -74,6 +81,8 @@ llamafactory-cli train \
     --video_max_pixels 65536 \
     --video_min_pixels 256
 
+echo "Training and prediction completed. Predictions saved to $OUTPUT_DIR/generated_predictions.jsonl"
+
 llamafactory-cli export \
     --model_name_or_path Qwen/Qwen3-VL-8B-Instruct \
     --adapter_name_or_path $OUTPUT_DIR \
@@ -83,3 +92,5 @@ llamafactory-cli export \
     --export_size 4 \
     --export_device cpu \
     --export_legacy_format False
+
+echo "Best model checkpoint merged and saved to $OUTPUT_DIR."
