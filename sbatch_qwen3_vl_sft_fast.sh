@@ -25,14 +25,12 @@ export TORCH_USE_CUDA_DSA=1
 export CUDA_LAUNCH_BLOCKING=0
 
 TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
-export OUTPUT_DIR="saves/Qwen3-VL-8B-Instruct/lora/train_${TIMESTAMP}_fast"
+export OUTPUT_DIR="saves/Qwen3-VL-8B-Instruct/lora/train_${TIMESTAMP}_fast_${SLURM_JOB_ID}"
 mkdir -p $OUTPUT_DIR
 
 llamafactory-cli train \
     --stage sft \
     --do_train True \
-    --do_predict True \
-    --predict_with_generate True \
     --model_name_or_path Qwen/Qwen3-VL-8B-Instruct \
     --preprocessing_num_workers 16 \
     --finetuning_type lora \
@@ -43,13 +41,16 @@ llamafactory-cli train \
     --eval_dataset iTRAP_qwen3_vl_val \
     --do_eval True \
     --eval_strategy epoch \
-    --save_strategy no \
+    --save_strategy epoch \
+    --load_best_model_at_end True \
+    --metric_for_best_model eval_loss \
+    --greater_is_better False \
     --cutoff_len 2048 \
     --learning_rate 5e-05 \
-    --num_train_epochs 1 \
+    --num_train_epochs 2 \
     --max_samples 50 \
     --per_device_train_batch_size 4 \
-    --per_device_eval_batch_size 2 \
+    --per_device_eval_batch_size 4 \
     --gradient_accumulation_steps 8 \
     --gradient_checkpointing True \
     --lr_scheduler_type cosine \
@@ -78,16 +79,61 @@ llamafactory-cli train \
     --video_max_pixels 65536 \
     --video_min_pixels 256
 
-echo "Training and prediction completed. Predictions saved to $OUTPUT_DIR/generated_predictions.jsonl"
+echo "Training completed."
+
+# Find the best checkpoint from trainer_state.json
+BEST_CHECKPOINT=$(python3 -c "
+import json
+try:
+    with open('$OUTPUT_DIR/trainer_state.json', 'r') as f:
+        state = json.load(f)
+    print(state.get('best_model_checkpoint', ''))
+except:
+    print('')
+")
+
+if [ -z "$BEST_CHECKPOINT" ]; then
+    echo "Warning: Could not find best_model_checkpoint. Using $OUTPUT_DIR."
+    CKPT_PATH=$OUTPUT_DIR
+else
+    echo "Best checkpoint found: $BEST_CHECKPOINT"
+    CKPT_PATH=$BEST_CHECKPOINT
+fi
+
+# Run predictions on the trained model
+llamafactory-cli train \
+    --stage sft \
+    --do_predict True \
+    --predict_with_generate True \
+    --model_name_or_path Qwen/Qwen3-VL-8B-Instruct \
+    --adapter_name_or_path $CKPT_PATH \
+    --finetuning_type lora \
+    --template qwen3_vl_nothink \
+    --flash_attn sdpa \
+    --dataset_dir data \
+    --eval_dataset iTRAP_qwen3_vl_val \
+    --cutoff_len 2048 \
+    --max_samples 50 \
+    --per_device_eval_batch_size 4 \
+    --output_dir $OUTPUT_DIR \
+    --bf16 True \
+    --freeze_vision_tower True \
+    --freeze_multi_modal_projector True \
+    --image_max_pixels 589824 \
+    --image_min_pixels 1024 \
+    --video_max_pixels 65536 \
+    --video_min_pixels 256
+
+echo "Predictions saved to $OUTPUT_DIR/generated_predictions.jsonl"
 
 llamafactory-cli export \
     --model_name_or_path Qwen/Qwen3-VL-8B-Instruct \
-    --adapter_name_or_path $OUTPUT_DIR \
+    --adapter_name_or_path $CKPT_PATH \
     --template qwen3_vl_nothink \
     --finetuning_type lora \
-    --export_dir $OUTPUT_DIR \
+    --export_dir $OUTPUT_DIR/merged_best \
     --export_size 4 \
     --export_device cpu \
     --export_legacy_format False
 
-echo "Best model checkpoint merged and saved to $OUTPUT_DIR."
+echo "Best checkpoint ($CKPT_PATH) merged and saved to $OUTPUT_DIR/merged_best"
