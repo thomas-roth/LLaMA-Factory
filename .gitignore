@@ -181,3 +181,6 @@ data/qwen3_vl
 
 logs
 outputs
+
+data/qwen3_vl_both_cams
+data/qwen3_vl_static_only

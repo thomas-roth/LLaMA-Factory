@@ -1,6 +1,6 @@
 {
-  "iTRAP_qwen3_vl": {
-    "file_name": "itrap_qwen3_vl.json",
+  "iTRAP_qwen3_vl_static_only": {
+    "file_name": "itrap_qwen3_vl_static_only.json",
     "formatting": "sharegpt",
     "columns": {
       "messages": "messages",
@@ -13,8 +13,36 @@
       "assistant_tag": "assistant"
     }
   },
-  "iTRAP_qwen3_vl_val": {
-    "file_name": "itrap_qwen3_vl_val.json",
+  "iTRAP_qwen3_vl_static_only_val": {
+    "file_name": "itrap_qwen3_vl_static_only_val.json",
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "messages",
+      "images": "images"
+    },
+    "tags": {
+      "role_tag": "role",
+      "content_tag": "content",
+      "user_tag": "user",
+      "assistant_tag": "assistant"
+    }
+  },
+  "iTRAP_qwen3_vl_both_cams": {
+    "file_name": "itrap_qwen3_vl_both_cams.json",
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "messages",
+      "images": "images"
+    },
+    "tags": {
+      "role_tag": "role",
+      "content_tag": "content",
+      "user_tag": "user",
+      "assistant_tag": "assistant"
+    }
+  },
+  "iTRAP_qwen3_vl_both_cams_val": {
+    "file_name": "itrap_qwen3_vl_both_cams_val.json",
     "formatting": "sharegpt",
     "columns": {
       "messages": "messages",

@@ -24,8 +24,7 @@ source /home/hk-project-p0024638/uruox/miniconda3/bin/activate lf
 export TORCH_USE_CUDA_DSA=1
 export CUDA_LAUNCH_BLOCKING=0
 
-TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
-export OUTPUT_DIR="saves/Qwen3-VL-8B-Instruct/lora/train_${TIMESTAMP}_${SLURM_JOB_ID}"
+export OUTPUT_DIR="saves/Qwen3-VL-8B-Instruct/lora/train_${SLURM_JOB_ID}"
 mkdir -p $OUTPUT_DIR
 
 llamafactory-cli train \
@@ -37,8 +36,8 @@ llamafactory-cli train \
     --template qwen3_vl_nothink \
     --flash_attn sdpa \
     --dataset_dir data \
-    --dataset iTRAP_qwen3_vl \
-    --eval_dataset iTRAP_qwen3_vl_val \
+    --dataset iTRAP_qwen3_vl_both_cams \
+    --eval_dataset iTRAP_qwen3_vl_val_both_cams \
     --do_eval True \
     --eval_strategy epoch \
     --save_strategy epoch \
@@ -48,11 +47,11 @@ llamafactory-cli train \
     --early_stopping_steps 3 \
     --cutoff_len 2048 \
     --learning_rate 5e-05 \
-    --num_train_epochs 9 \
+    --num_train_epochs 12 \
     --max_samples 100000 \
-    --per_device_train_batch_size 16 \
+    --per_device_train_batch_size 4 \
     --per_device_eval_batch_size 4 \
-    --gradient_accumulation_steps 4 \
+    --gradient_accumulation_steps 16 \
     --lr_scheduler_type cosine \
     --max_grad_norm 1.0 \
     --logging_steps 10 \
@@ -111,7 +110,7 @@ llamafactory-cli train \
     --template qwen3_vl_nothink \
     --flash_attn sdpa \
     --dataset_dir data \
-    --eval_dataset iTRAP_qwen3_vl_val \
+    --eval_dataset iTRAP_qwen3_vl_val_both_cams \
     --cutoff_len 2048 \
     --max_samples 100000 \
     --per_device_eval_batch_size 4 \
