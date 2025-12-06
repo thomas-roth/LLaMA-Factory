@@ -36,8 +36,8 @@ llamafactory-cli train \
     --template qwen3_vl_nothink \
     --flash_attn sdpa \
     --dataset_dir data \
-    --dataset iTRAP_qwen3_vl_both_cams \
-    --eval_dataset iTRAP_qwen3_vl_val_both_cams \
+    --dataset iTRAP_qwen3_vl_both_cams_both_trajs_separate_queries \
+    --eval_dataset iTRAP_qwen3_vl_both_cams_both_trajs_separate_queries_val \
     --do_eval True \
     --eval_strategy epoch \
     --save_strategy epoch \
@@ -110,7 +110,7 @@ llamafactory-cli train \
     --template qwen3_vl_nothink \
     --flash_attn sdpa \
     --dataset_dir data \
-    --eval_dataset iTRAP_qwen3_vl_val_both_cams \
+    --eval_dataset iTRAP_qwen3_vl_both_cams_both_trajs_separate_queries_val \
     --cutoff_len 2048 \
     --max_samples 100000 \
     --per_device_eval_batch_size 4 \

@@ -27,8 +27,8 @@
       "assistant_tag": "assistant"
     }
   },
-  "iTRAP_qwen3_vl_both_cams": {
-    "file_name": "itrap_qwen3_vl_both_cams.json",
+  "iTRAP_qwen3_vl_both_cams_static_traj_only": {
+    "file_name": "itrap_qwen3_vl_both_cams_static_traj_only.json",
     "formatting": "sharegpt",
     "columns": {
       "messages": "messages",
@@ -41,8 +41,64 @@
       "assistant_tag": "assistant"
     }
   },
-  "iTRAP_qwen3_vl_both_cams_val": {
-    "file_name": "itrap_qwen3_vl_both_cams_val.json",
+  "iTRAP_qwen3_vl_both_cams_static_traj_only_val": {
+    "file_name": "itrap_qwen3_vl_both_cams_static_traj_only_val.json",
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "messages",
+      "images": "images"
+    },
+    "tags": {
+      "role_tag": "role",
+      "content_tag": "content",
+      "user_tag": "user",
+      "assistant_tag": "assistant"
+    }
+  },
+  "iTRAP_qwen3_vl_both_cams_both_trajs_merged_queries": {
+    "file_name": "itrap_qwen3_vl_both_cams_both_trajs_merged_queries.json",
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "messages",
+      "images": "images"
+    },
+    "tags": {
+      "role_tag": "role",
+      "content_tag": "content",
+      "user_tag": "user",
+      "assistant_tag": "assistant"
+    }
+  },
+  "iTRAP_qwen3_vl_both_cams_both_trajs_merged_queries_val": {
+    "file_name": "itrap_qwen3_vl_both_cams_both_trajs_merged_queries_val.json",
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "messages",
+      "images": "images"
+    },
+    "tags": {
+      "role_tag": "role",
+      "content_tag": "content",
+      "user_tag": "user",
+      "assistant_tag": "assistant"
+    }
+  },
+  "iTRAP_qwen3_vl_both_cams_both_trajs_separate_queries": {
+    "file_name": "itrap_qwen3_vl_both_cams_both_trajs_separate_queries.json",
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "messages",
+      "images": "images"
+    },
+    "tags": {
+      "role_tag": "role",
+      "content_tag": "content",
+      "user_tag": "user",
+      "assistant_tag": "assistant"
+    }
+  },
+  "iTRAP_qwen3_vl_both_cams_both_trajs_separate_queries_val": {
+    "file_name": "itrap_qwen3_vl_both_cams_both_trajs_separate_queries_val.json",
     "formatting": "sharegpt",
     "columns": {
       "messages": "messages",
