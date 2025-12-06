@@ -34,3 +34,8 @@ sse-starlette
 # media
 av
 librosa
+# eval
+jieba
+nltk
+rouge-chinese
+vllm
