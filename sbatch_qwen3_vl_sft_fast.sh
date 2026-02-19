@@ -18,6 +18,8 @@
 
 # -------------------------------
 
+export DATASET_NAME="iTRAP_qwen3_vl"
+
 # Activate the virtualenv / conda environment
 source /home/hk-project-p0024638/uruox/miniconda3/bin/activate lf
 
@@ -37,8 +39,8 @@ llamafactory-cli train \
     --template qwen3_vl_nothink \
     --flash_attn sdpa \
     --dataset_dir data \
-    --dataset iTRAP_qwen3_vl \
-    --eval_dataset iTRAP_qwen3_vl_val \
+    --dataset $DATASET_NAME \
+    --eval_dataset ${DATASET_NAME}_val \
     --do_eval True \
     --eval_strategy epoch \
     --save_strategy epoch \
@@ -72,8 +74,8 @@ llamafactory-cli train \
     --lora_alpha 16 \
     --lora_dropout 0 \
     --lora_target all \
-    --freeze_vision_tower True \
-    --freeze_multi_modal_projector True \
+    --freeze_vision_tower False \
+    --freeze_multi_modal_projector False \
     --image_max_pixels 589824 \
     --image_min_pixels 1024 \
     --video_max_pixels 65536 \
@@ -111,14 +113,14 @@ llamafactory-cli train \
     --template qwen3_vl_nothink \
     --flash_attn sdpa \
     --dataset_dir data \
-    --eval_dataset iTRAP_qwen3_vl_val \
+    --eval_dataset ${DATASET_NAME}_val \
     --cutoff_len 2048 \
     --max_samples 50 \
     --per_device_eval_batch_size 4 \
     --output_dir $OUTPUT_DIR \
     --bf16 True \
-    --freeze_vision_tower True \
-    --freeze_multi_modal_projector True \
+    --freeze_vision_tower False \
+    --freeze_multi_modal_projector False \
     --image_max_pixels 589824 \
     --image_min_pixels 1024 \
     --video_max_pixels 65536 \

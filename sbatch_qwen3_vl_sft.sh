@@ -18,6 +18,8 @@
 
 # -------------------------------
 
+export DATASET_NAME="iTRAP_qwen3_vl_both_cams_both_trajs_merged_queries"
+
 # Activate the virtualenv / conda environment
 source /home/hk-project-p0024638/uruox/miniconda3/bin/activate lf
 
@@ -28,55 +30,55 @@ export OUTPUT_DIR="saves/Qwen3-VL-8B-Instruct/lora/train_${SLURM_JOB_ID}"
 mkdir -p $OUTPUT_DIR
 
 llamafactory-cli train \
-    --stage sft \
-    --do_train True \
-    --model_name_or_path Qwen/Qwen3-VL-8B-Instruct \
-    --preprocessing_num_workers 16 \
-    --finetuning_type lora \
-    --template qwen3_vl_nothink \
-    --flash_attn sdpa \
-    --dataset_dir data \
-    --dataset iTRAP_qwen3_vl_both_cams_both_trajs_separate_queries \
-    --eval_dataset iTRAP_qwen3_vl_both_cams_both_trajs_separate_queries_val \
-    --do_eval True \
-    --eval_strategy epoch \
-    --save_strategy epoch \
-    --load_best_model_at_end True \
-    --metric_for_best_model eval_loss \
-    --greater_is_better False \
-    --early_stopping_steps 3 \
-    --cutoff_len 2048 \
-    --learning_rate 5e-05 \
-    --num_train_epochs 12 \
-    --max_samples 100000 \
-    --per_device_train_batch_size 4 \
-    --per_device_eval_batch_size 4 \
-    --gradient_accumulation_steps 16 \
-    --lr_scheduler_type cosine \
-    --max_grad_norm 1.0 \
-    --logging_steps 10 \
-    --warmup_steps 20 \
-    --packing False \
-    --enable_thinking False \
-    --report_to none \
-    --output_dir $OUTPUT_DIR \
-    --bf16 True \
-    --save_safetensors True \
-    --save_only_model True \
-    --plot_loss True \
-    --ddp_timeout 180000000 \
-    --include_num_input_tokens_seen True \
-    --optim adamw_torch_fused \
-    --lora_rank 8 \
-    --lora_alpha 16 \
-    --lora_dropout 0 \
-    --lora_target all \
-    --freeze_vision_tower True \
-    --freeze_multi_modal_projector True \
-    --image_max_pixels 589824 \
-    --image_min_pixels 1024 \
-    --video_max_pixels 65536 \
-    --video_min_pixels 256
+  --stage sft \
+  --do_train True \
+  --model_name_or_path Qwen/Qwen3-VL-8B-Instruct \
+  --preprocessing_num_workers 16 \
+  --finetuning_type lora \
+  --template qwen3_vl_nothink \
+  --flash_attn sdpa \
+  --dataset_dir data \
+  --dataset $DATASET_NAME \
+  --eval_dataset ${DATASET_NAME}_val \
+  --do_eval True \
+  --eval_strategy epoch \
+  --save_strategy epoch \
+  --load_best_model_at_end True \
+  --metric_for_best_model eval_loss \
+  --greater_is_better False \
+  --early_stopping_steps 3 \
+  --cutoff_len 2048 \
+  --learning_rate 5e-05 \
+  --num_train_epochs 12 \
+  --max_samples 100000 \
+  --per_device_train_batch_size 4 \
+  --per_device_eval_batch_size 4 \
+  --gradient_accumulation_steps 16 \
+  --lr_scheduler_type cosine \
+  --max_grad_norm 1.0 \
+  --logging_steps 10 \
+  --warmup_steps 20 \
+  --packing False \
+  --enable_thinking False \
+  --report_to none \
+  --output_dir $OUTPUT_DIR \
+  --bf16 True \
+  --save_safetensors True \
+  --save_only_model True \
+  --plot_loss True \
+  --ddp_timeout 180000000 \
+  --include_num_input_tokens_seen True \
+  --optim adamw_torch_fused \
+  --lora_rank 8 \
+  --lora_alpha 16 \
+  --lora_dropout 0 \
+  --lora_target all \
+  --freeze_vision_tower False \
+  --freeze_multi_modal_projector False \
+  --image_max_pixels 589824 \
+  --image_min_pixels 1024 \
+  --video_max_pixels 65536 \
+  --video_min_pixels 256
 
 echo "Training completed."
 
@@ -92,47 +94,47 @@ except:
 ")
 
 if [ -z "$BEST_CHECKPOINT" ]; then
-    echo "Warning: Could not find best_model_checkpoint. Using $OUTPUT_DIR."
-    CKPT_PATH=$OUTPUT_DIR
+  echo "Warning: Could not find best_model_checkpoint. Using $OUTPUT_DIR."
+  CKPT_PATH=$OUTPUT_DIR
 else
-    echo "Best checkpoint found: $BEST_CHECKPOINT"
-    CKPT_PATH=$BEST_CHECKPOINT
+  echo "Best checkpoint found: $BEST_CHECKPOINT"
+  CKPT_PATH=$BEST_CHECKPOINT
 fi
 
 # Run predictions on best checkpoint
 llamafactory-cli train \
-    --stage sft \
-    --do_predict True \
-    --predict_with_generate True \
-    --model_name_or_path Qwen/Qwen3-VL-8B-Instruct \
-    --adapter_name_or_path $CKPT_PATH \
-    --finetuning_type lora \
-    --template qwen3_vl_nothink \
-    --flash_attn sdpa \
-    --dataset_dir data \
-    --eval_dataset iTRAP_qwen3_vl_both_cams_both_trajs_separate_queries_val \
-    --cutoff_len 2048 \
-    --max_samples 100000 \
-    --per_device_eval_batch_size 4 \
-    --output_dir $OUTPUT_DIR/merged_best \
-    --bf16 True \
-    --freeze_vision_tower True \
-    --freeze_multi_modal_projector True \
-    --image_max_pixels 589824 \
-    --image_min_pixels 1024 \
-    --video_max_pixels 65536 \
-    --video_min_pixels 256
+  --stage sft \
+  --do_predict True \
+  --predict_with_generate True \
+  --model_name_or_path Qwen/Qwen3-VL-8B-Instruct \
+  --adapter_name_or_path $CKPT_PATH \
+  --finetuning_type lora \
+  --template qwen3_vl_nothink \
+  --flash_attn sdpa \
+  --dataset_dir data \
+  --eval_dataset ${DATASET_NAME}_val \
+  --cutoff_len 2048 \
+  --max_samples 100000 \
+  --per_device_eval_batch_size 4 \
+  --output_dir $OUTPUT_DIR/merged_best \
+  --bf16 True \
+  --freeze_vision_tower False \
+  --freeze_multi_modal_projector False \
+  --image_max_pixels 589824 \
+  --image_min_pixels 1024 \
+  --video_max_pixels 65536 \
+  --video_min_pixels 256
 
 echo "Predictions saved to $OUTPUT_DIR/generated_predictions.jsonl"
 
 llamafactory-cli export \
-    --model_name_or_path Qwen/Qwen3-VL-8B-Instruct \
-    --adapter_name_or_path $CKPT_PATH \
-    --template qwen3_vl_nothink \
-    --finetuning_type lora \
-    --export_dir $OUTPUT_DIR/merged_best \
-    --export_size 4 \
-    --export_device cpu \
-    --export_legacy_format False
+  --model_name_or_path Qwen/Qwen3-VL-8B-Instruct \
+  --adapter_name_or_path $CKPT_PATH \
+  --template qwen3_vl_nothink \
+  --finetuning_type lora \
+  --export_dir $OUTPUT_DIR/merged_best \
+  --export_size 4 \
+  --export_device cpu \
+  --export_legacy_format False
 
 echo "Best checkpoint ($CKPT_PATH) merged and saved to $OUTPUT_DIR/merged_best"
