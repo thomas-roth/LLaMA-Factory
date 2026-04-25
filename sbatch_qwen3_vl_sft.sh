@@ -49,7 +49,7 @@ llamafactory-cli train \
   --early_stopping_steps 3 \
   --cutoff_len 2048 \
   --learning_rate 5e-05 \
-  --num_train_epochs 12 \
+  --num_train_epochs 18 \
   --max_samples 100000 \
   --per_device_train_batch_size 4 \
   --per_device_eval_batch_size 4 \
