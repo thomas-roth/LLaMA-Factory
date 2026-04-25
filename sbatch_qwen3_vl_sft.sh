@@ -18,7 +18,7 @@
 
 # -------------------------------
 
-export DATASET_NAME="iTRAP_qwen3_vl_both_cams_both_trajs_merged_queries"
+export DATASET_NAME="iTRAP_qwen3_vl_both_cams_3d_trajs"
 
 # Activate the virtualenv / conda environment
 source /home/hk-project-p0024638/uruox/miniconda3/bin/activate lf
